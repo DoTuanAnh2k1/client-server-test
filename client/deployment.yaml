@@ -1,0 +1,45 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: client-deploy
+  namespace: test
+spec:
+  selector:
+    matchLabels:
+      app: client
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+      - name: client
+        image: test
+        env:
+        - name: ServerHeadlessSvc
+          value: "server-headless-svc"
+        - name: ServerPort
+          value: "3654"
+        ports:
+        - containerPort: 3317
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-svc
+  namespace: test
+spec:
+  selector:
+    app: client
+  type: ClusterIP
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+  - name: client-port
+    protocol: TCP
+    port: 3317
+    targetPort: 3317 
+    nodePort: 3317

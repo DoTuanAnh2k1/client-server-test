@@ -1,0 +1,45 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: mgt-deploy
+  namespace: test
+spec:
+  selector:
+    matchLabels:
+      app: mgt
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mgt
+    spec:
+      containers:
+      - name: mgt
+        image: test
+        env:
+        - name: ServerHeadlessSvc
+          value: "server-headless-svc"
+        - name: ServerPort
+          value: "3654"
+        ports:
+        - containerPort: 3317
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mgt-svc
+  namespace: test
+spec:
+  selector:
+    app: mgt
+  type: ClusterIP
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+  - name: mgt-port
+    protocol: TCP
+    port: 1234
+    targetPort: 1234 
+    nodePort: 1234
