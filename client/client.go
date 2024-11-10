@@ -28,8 +28,9 @@ type Connection struct {
 }
 
 var (
-	ConnectionList []*Connection
-	ClientList     []*http.Client
+	ConnectionSolutionList []*Connection
+	ConnectionList         []*Connection
+	ClientList             []*http.Client
 )
 
 var (
@@ -39,13 +40,15 @@ var (
 )
 
 var (
-	indexConnectionGet int
-	indexClientGet     int
+	indexConnectionSolutionGet int
+	indexConnectionGet         int
+	indexClientGet             int
 )
 
 var (
 	IsHeadlessSvc   bool = false
 	IsSvc           bool = false
+	IsSvcSolution   bool = false
 	IsSvcInitClient bool = false
 )
 
@@ -63,6 +66,25 @@ func lookupListIp(headlessSvc string) []string {
 		listIp = append(listIp, v.String())
 	}
 	return listIp
+}
+
+func InitSolutionConnection() *Connection {
+	connection := &Connection{
+		UrlTest:    Scheme + ServerSvc + ":" + ServerPort + PathTest,
+		ClientList: make([]*http.Client, NumberOfClient),
+	}
+	for i := 0; i < NumberOfClient; i++ {
+		connection.ClientList[i] = &http.Client{
+			Transport: &http2.Transport{
+				AllowHTTP:          true,
+				DisableCompression: true,
+				DialTLSContext:     dialTlsContext,
+				IdleConnTimeout:    10 * time.Second,
+			},
+			Timeout: 2 * time.Second,
+		}
+	}
+	return connection
 }
 
 func InitConnection(ip, serverPort string) *Connection {
@@ -108,6 +130,14 @@ func InitConnectionList() {
 		}
 		go client.Get(url)
 		ClientList = append(ClientList, client)
+	}
+}
+
+func InitConnectionSolutionList() {
+	ipList := lookupListIp(ServerHeadlessSvc)
+	for i := 0; i < len(ipList); i++ {
+		connection := InitSolutionConnection()
+		ConnectionSolutionList = append(ConnectionSolutionList, connection)
 	}
 }
 
@@ -166,6 +196,11 @@ func getConnection() *Connection {
 	return ConnectionList[indexConnectionGet%len(ConnectionList)]
 }
 
+func getSolutionConnection() *Connection {
+	indexConnectionSolutionGet++
+	return ConnectionSolutionList[indexConnectionSolutionGet%len(ConnectionList)]
+}
+
 func sendReq() {
 	for {
 		if !IsHeadlessSvc {
@@ -173,10 +208,7 @@ func sendReq() {
 		}
 		connection := getConnection()
 		client := getClient(connection.ClientList)
-		_, err := client.Get(connection.UrlTest)
-		if err != nil {
-			continue
-		}
+		client.Get(connection.UrlTest)
 	}
 }
 
@@ -187,14 +219,6 @@ func sendReqService() {
 			continue
 		}
 		client := getClient(ClientList)
-		// client := &http.Client{
-		// 	Transport: &http2.Transport{
-		// 		AllowHTTP:          true,
-		// 		DisableCompression: true,
-		// 		DialTLSContext:     dialTlsContext,
-		// 	},
-		// 	Timeout: 2 * time.Second,
-		// }
 		client.Get(url)
 	}
 }
@@ -214,6 +238,16 @@ func sendReqServiceInitNewClient() {
 			Timeout: 2 * time.Second,
 		}
 		client.Get(url)
+	}
+}
+
+func sendReqServiceSolution() {
+	url := Scheme + ServerSvc + ":" + ServerPort + PathTest
+	for {
+		if !IsSvcSolution {
+			continue
+		}
+		getClient(getSolutionConnection().ClientList).Get(url)
 	}
 }
 
@@ -293,6 +327,8 @@ func ProblemDo() {
 
 func newGin() *gin.Engine {
 	r := gin.Default()
+
+	// Headless svc
 	r.GET("/send-req", func(c *gin.Context) {
 		IsHeadlessSvc = true
 		c.String(http.StatusOK, "ok")
@@ -301,6 +337,8 @@ func newGin() *gin.Engine {
 		IsHeadlessSvc = false
 		c.String(http.StatusOK, "ok")
 	})
+
+	// Svc
 	r.GET("/send-req-svc", func(c *gin.Context) {
 		IsSvc = true
 		c.String(http.StatusOK, "ok")
@@ -309,6 +347,8 @@ func newGin() *gin.Engine {
 		IsSvc = false
 		c.String(http.StatusOK, "ok")
 	})
+
+	// Svc with init new client every time send
 	r.GET("/send-req-svc-init-client", func(c *gin.Context) {
 		IsSvcInitClient = true
 		c.String(http.StatusOK, "ok")
@@ -331,6 +371,17 @@ func newGin() *gin.Engine {
 		ProblemDo()
 		c.String(http.StatusOK, "ok")
 	})
+
+	// Solution
+	r.GET("/send-req-svc-sol", func(c *gin.Context) {
+		IsSvcSolution = true
+		c.String(http.StatusOK, "ok")
+	})
+	r.GET("/off-send-req-svc-sol", func(c *gin.Context) {
+		IsSvcSolution = false
+		c.String(http.StatusOK, "ok")
+	})
+
 	return r
 }
 
@@ -352,11 +403,17 @@ func StartSendReq() {
 	go sendReq()
 	go sendReqService()
 	go sendReqServiceInitNewClient()
+	go sendReqServiceSolution()
+}
+
+func Init() {
+	InitVariable()
+	InitConnectionList()
+	InitConnectionSolutionList()
 }
 
 func main() {
-	InitVariable()
-	InitConnectionList()
+	Init()
 	go ScanIp()
 	go StartSendReq()
 	clientServer := newGin()

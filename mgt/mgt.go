@@ -23,6 +23,26 @@ type ServerResp struct {
 	InitRequest uint64 `json:"init-req"`
 }
 
+var (
+	ClientSvc         string
+	ClientPort        string
+	ServerHeadlessSvc string
+	ServerPort        string
+)
+
+const (
+	Service           = "svc"
+	ServiceInitClient = "svc-init"
+	ServiceHeadless   = "svc-headless"
+	ServiceSol        = "svc-sol"
+)
+
+const (
+	ProblemInit      = "init"
+	ProblemReconnect = "reconnect"
+	ProblemDo        = "do"
+)
+
 func getEnv(key, defaultVal string) string {
 	val := os.Getenv(key)
 	if val == "" {
@@ -44,12 +64,10 @@ func lookupListIp(headlessSvc string) []string {
 }
 
 func getInfo(c *gin.Context) {
-	headlessSvc := getEnv("ServerHeadlessSvc", "localhost")
-	serverPort := getEnv("ServerPort", "3654")
-	ipList := lookupListIp(headlessSvc)
+	ipList := lookupListIp(ServerHeadlessSvc)
 	var podInfoList []PodInfo
 	for _, ip := range ipList {
-		url := "http://" + ip + ":" + serverPort + "/info"
+		url := "http://" + ip + ":" + ServerPort + "/info"
 		client := http.Client{
 			Timeout: 2 * time.Second,
 		}
@@ -79,52 +97,65 @@ func getInfo(c *gin.Context) {
 	c.JSON(200, podInfoList)
 }
 
-func triggerOnHeadless(c *gin.Context) {
-	clientSvc := getEnv("ClientSvc", "localhost")
-	clientPort := getEnv("ClientPort", "3317")
-	url := "http://" + clientSvc + ":" + clientPort + "/send-req"
+func triggerOn(c *gin.Context) {
+	name := c.Param("name")
+	var url string
+	switch name {
+	case Service:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/send-req-svc"
+	case ServiceInitClient:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/send-req-svc-init-client"
+	case ServiceHeadless:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/send-req"
+	case ServiceSol:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/send-req-svc-sol"
+	default:
+		c.JSON(http.StatusBadRequest, "name unsupported")
+		return
+	}
 	client := http.Client{}
 	client.Get(url)
+	c.JSON(http.StatusOK, "ok")
 }
 
-func triggerOffHeadless(c *gin.Context) {
-	clientSvc := getEnv("ClientSvc", "localhost")
-	clientPort := getEnv("ClientPort", "3317")
-	url := "http://" + clientSvc + ":" + clientPort + "/off-send-req"
+func triggerOff(c *gin.Context) {
+	name := c.Param("name")
+	var url string
+	switch name {
+	case Service:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/off-send-req-svc"
+	case ServiceInitClient:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/off-send-req-svc-init-client"
+	case ServiceHeadless:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/off-send-req"
+	case ServiceSol:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/off-send-req-svc-sol"
+	default:
+		c.JSON(http.StatusBadRequest, "name unsupported")
+		return
+	}
 	client := http.Client{}
 	client.Get(url)
+	c.JSON(http.StatusOK, "ok")
 }
 
-func triggerOnService(c *gin.Context) {
-	clientSvc := getEnv("ClientSvc", "localhost")
-	clientPort := getEnv("ClientPort", "3317")
-	url := "http://" + clientSvc + ":" + clientPort + "/send-req-svc"
+func triggerProblem(c *gin.Context) {
+	name := c.Param("name")
+	var url string
+	switch name {
+	case ProblemInit:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/problem-init"
+	case ProblemReconnect:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/problem-reconnect"
+	case ProblemDo:
+		url = "http://" + ClientSvc + ":" + ClientPort + "/problem-do"
+	default:
+		c.JSON(http.StatusBadRequest, "name unsupported")
+		return
+	}
 	client := http.Client{}
 	client.Get(url)
-}
-
-func triggerOffService(c *gin.Context) {
-	clientSvc := getEnv("ClientSvc", "localhost")
-	clientPort := getEnv("ClientPort", "3317")
-	url := "http://" + clientSvc + ":" + clientPort + "/off-send-req-svc"
-	client := http.Client{}
-	client.Get(url)
-}
-
-func triggerOnServiceInitClient(c *gin.Context) {
-	clientSvc := getEnv("ClientSvc", "localhost")
-	clientPort := getEnv("ClientPort", "3317")
-	url := "http://" + clientSvc + ":" + clientPort + "/send-req-svc-init-client"
-	client := http.Client{}
-	client.Get(url)
-}
-
-func triggerOffServiceInitClient(c *gin.Context) {
-	clientSvc := getEnv("ClientSvc", "localhost")
-	clientPort := getEnv("ClientPort", "3317")
-	url := "http://" + clientSvc + ":" + clientPort + "/off-send-req-svc-init-client"
-	client := http.Client{}
-	client.Get(url)
+	c.JSON(http.StatusOK, "ok")
 }
 
 func newGin() *gin.Engine {
@@ -133,16 +164,19 @@ func newGin() *gin.Engine {
 		c.String(200, "ok")
 	})
 	r.GET("/info", getInfo)
-	r.GET("/trigger-svc", triggerOnService)
-	r.GET("/trigger-off-svc", triggerOffService)
-	r.GET("/trigger-svc-init-client", triggerOnServiceInitClient)
-	r.GET("/trigger-off-svc-init-client", triggerOffServiceInitClient)
-	r.GET("/trigger-headless-svc", triggerOnHeadless)
-	r.GET("/trigger-off-headless-svc", triggerOffHeadless)
+
+	r.GET("/trigger/on/:name", triggerOn)
+	r.GET("/trigger/off/:name", triggerOff)
+	r.GET("/trigger/problem/:name", triggerProblem)
+
 	return r
 }
 
 func main() {
+	ClientSvc = getEnv("ClientSvc", "localhost")
+	ClientPort = getEnv("ClientPort", "3317")
+	ServerHeadlessSvc = getEnv("ServerHeadlessSvc", "localhost")
+	ServerPort = getEnv("ServerPort", "3654")
 	server := newGin()
 	server.Run(":1234")
 }
