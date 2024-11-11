@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,10 @@ type PodInfo struct {
 type ServerResp struct {
 	Request     uint64 `json:"request"`
 	InitRequest uint64 `json:"init-req"`
+}
+
+type ServerMeasure struct {
+	Request uint64 `json:"request"`
 }
 
 var (
@@ -97,6 +102,47 @@ func getInfo(c *gin.Context) {
 	c.JSON(200, podInfoList)
 }
 
+func getMeasure(c *gin.Context) {
+	ipList := lookupListIp(ServerHeadlessSvc)
+	var podInfoList []PodInfo
+	var wg sync.WaitGroup
+
+	for _, ip := range ipList {
+		wg.Add(1)
+		go getPodMeasure(&wg, ip, &podInfoList)
+	}
+	wg.Wait()
+
+	c.JSON(200, podInfoList)
+}
+
+func getPodMeasure(wg *sync.WaitGroup, podIp string, podInfoList *[]PodInfo) {
+	var serverResp ServerMeasure
+	url := "http://" + podIp + ":" + ServerPort + "/measure"
+	client := http.Client{}
+	resp, err := client.Get(url)
+	if err != nil {
+		fmt.Println("err: ", err)
+		return
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("err: ", err)
+		return
+	}
+	err = json.Unmarshal(body, &serverResp)
+	if err != nil {
+		fmt.Println("err: ", err)
+		return
+	}
+	resp.Body.Close()
+	*podInfoList = append(*podInfoList, PodInfo{
+		Ip:          podIp,
+		NumberOfReq: serverResp.Request,
+	})
+	wg.Done()
+}
+
 func triggerOn(c *gin.Context) {
 	name := c.Param("name")
 	var url string
@@ -168,6 +214,7 @@ func newGin() *gin.Engine {
 	r.GET("/trigger/on/:name", triggerOn)
 	r.GET("/trigger/off/:name", triggerOff)
 	r.GET("/trigger/problem/:name", triggerProblem)
+	r.GET("/trigger/measure", getMeasure)
 
 	return r
 }

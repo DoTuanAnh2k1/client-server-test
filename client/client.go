@@ -52,6 +52,20 @@ var (
 	IsSvcInitClient bool = false
 )
 
+func dialTlsContextTimeOut(ctx context.Context, network, address string, cfg *tls.Config) (net.Conn, error) {
+	conn, err := net.Dial(network, address)
+	if err != nil {
+		return nil, err
+	}
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		conn.Close()
+	}()
+
+	return conn, nil
+}
+
 func dialTlsContext(ctx context.Context, network, address string, cfg *tls.Config) (net.Conn, error) {
 	return net.Dial(network, address)
 }
@@ -78,8 +92,7 @@ func InitSolutionConnection() *Connection {
 			Transport: &http2.Transport{
 				AllowHTTP:          true,
 				DisableCompression: true,
-				DialTLSContext:     dialTlsContext,
-				IdleConnTimeout:    10 * time.Second,
+				DialTLSContext:     dialTlsContextTimeOut,
 			},
 			Timeout: 2 * time.Second,
 		}
@@ -253,6 +266,7 @@ func sendReqServiceSolution() {
 
 // Problem: imagine we have 3 http2 clients in server client A, each client
 // connect to one server pod (B1, B2, B3). These clients are the same.
+
 var (
 	clientB1 = &http.Client{
 		Transport: &http2.Transport{
@@ -283,6 +297,7 @@ var (
 // We init this client's connection by using that client send one http
 // request direct to Bi (with i in range 1 to 3). So we have client B1
 // connect to B1, client B2 connect to B2, client B3 connect to B3
+
 func InitConnectionForProblem() {
 	// Get list ip of server B
 	// let's say we have 3 pods only
@@ -305,16 +320,18 @@ func InitConnectionForProblem() {
 // client B3 lost tcp connection to B3. We will use client B3 send a request
 // to B through k8s service. We expect that client B3 gonna connect to
 // pod B1 or B2.
+
 func ReconnectClient() {
 	url := Scheme + ServerSvc + ":" + ServerPort + PathProblem + "3"
 	clientB3.Get(url)
 }
 
-// We init B3 up now. We use three client to send request to server B
+// We are getting B3 up now. We use three client to send request to server B
 // through k8s service. If my hypothesis is correct then B3 will not
 // get any request, B1 and B2 each will get one requets from client B1
 // and client B2, client B3 will send request to pod B1 or B2 depend on
 // which pod it have been send when try reconnect
+
 func ProblemDo() {
 	urlBase := Scheme + ServerSvc + ":" + ServerPort + PathProblem
 
@@ -322,8 +339,6 @@ func ProblemDo() {
 	clientB2.Get(urlBase + "2")
 	clientB3.Get(urlBase + "3")
 }
-
-// Hope it right :D
 
 func newGin() *gin.Engine {
 	r := gin.Default()

@@ -22,6 +22,10 @@ type ServerResp struct {
 	InitRequest uint64 `json:"init-req"`
 }
 
+type ServerMeasure struct {
+	Request uint64 `json:"request"`
+}
+
 func InitHandler(w http.ResponseWriter, r *http.Request) {
 	CountRequestInit++
 	fmt.Println("Init Handler #", CountRequestInit)
@@ -48,10 +52,27 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
 
 func ProblemHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
-	fmt.Println("----------------------------------")
+	fmt.Println("---------------------------------")
 	fmt.Println("This is " + name + "'s connection")
-	fmt.Println("----------------------------------")
+	fmt.Println("---------------------------------")
 	w.WriteHeader(http.StatusOK)
+}
+
+func Measure(w http.ResponseWriter, r *http.Request) {
+	ans := uint64(0)
+	for i := 0; i < 10; i++ {
+		ans = ans + CountRequestRate/10
+		time.Sleep(1 * time.Second)
+	}
+	var serverMeasure ServerMeasure
+	serverMeasure.Request = ans
+
+	body, err := json.Marshal(serverMeasure)
+	if err != nil {
+		panic(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(body)
 }
 
 func newRouter() *http.ServeMux {
@@ -60,6 +81,7 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("/init", InitHandler)
 	mux.HandleFunc("/info", InfoHandler)
 	mux.HandleFunc("/problem", ProblemHandler)
+	mux.HandleFunc("/measure", Measure)
 	return mux
 }
 
