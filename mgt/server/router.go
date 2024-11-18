@@ -96,6 +96,12 @@ func triggerOn(c *gin.Context) {
 		url += ClientPathTriggerSvc
 	case common.ServiceHeadless:
 		url += ClientPathTriggerHeadlessSvc
+	case common.RabbitMQ:
+		url += ClientPathRabbitMQ
+	case common.GRPC:
+		url += ClientPathGRPC
+	case common.Kafka:
+		url += ClientPathKafka
 	default:
 		c.JSON(http.StatusBadRequest, "name unsupported")
 		return
@@ -113,6 +119,12 @@ func triggerOff(c *gin.Context) {
 		url += ClientPathTriggerSvc
 	case common.ServiceHeadless:
 		url += ClientPathTriggerHeadlessSvc
+	case common.RabbitMQ:
+		url += ClientPathRabbitMQ
+	case common.GRPC:
+		url += ClientPathGRPC
+	case common.Kafka:
+		url += ClientPathKafka
 	default:
 		c.JSON(http.StatusBadRequest, "name unsupported")
 		return

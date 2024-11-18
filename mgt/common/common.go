@@ -27,6 +27,9 @@ var (
 const (
 	Service         = "svc"
 	ServiceHeadless = "svc-headless"
+	RabbitMQ        = "rabbit-mq"
+	Kafka           = "kafka"
+	GRPC            = "grpc"
 )
 
 const (
