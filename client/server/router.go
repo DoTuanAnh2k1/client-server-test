@@ -2,6 +2,7 @@ package server
 
 import (
 	"client/problem"
+	rabbitmq "client/producer/rabbitMQ"
 	"client/producer/service"
 	serviceheadless "client/producer/service_headless"
 	"net/http"
@@ -14,6 +15,8 @@ func triggerOnHandler(w http.ResponseWriter, r *http.Request) {
 		serviceheadless.TriggerOn()
 	case Service:
 		service.TriggerOn()
+	case RabbitMQ:
+		rabbitmq.TriggerOn()
 	default:
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -28,6 +31,8 @@ func triggerOffHandler(w http.ResponseWriter, r *http.Request) {
 		serviceheadless.TriggerOff()
 	case Service:
 		service.TriggerOff()
+	case RabbitMQ:
+		rabbitmq.TriggerOff()
 	default:
 		w.WriteHeader(http.StatusBadRequest)
 		return

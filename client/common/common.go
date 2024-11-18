@@ -10,6 +10,12 @@ const (
 	PathProblem    = "/problem?name=client"
 )
 
+const (
+	TimeSleep = 10
+)
+
+const MessageBody = "HeHe"
+
 type Connection struct {
 	Ip         string
 	UrlTest    string

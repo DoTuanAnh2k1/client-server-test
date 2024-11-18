@@ -10,7 +10,7 @@ func sendReq() {
 	url := common.Scheme + serverSvc + ":" + serverPort + common.PathTest
 	for {
 		if !isSvc {
-			time.Sleep(10 * time.Second)
+			time.Sleep(common.TimeSleep * time.Second)
 			continue
 		}
 		client := getClient(clientList)

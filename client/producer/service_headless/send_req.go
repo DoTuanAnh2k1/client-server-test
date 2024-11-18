@@ -9,7 +9,7 @@ import (
 func sendReq() {
 	for {
 		if !isHeadlessSvc {
-			time.Sleep(10 * time.Second)
+			time.Sleep(common.TimeSleep * time.Second)
 			continue
 		}
 		connection := getConnection()
