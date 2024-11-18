@@ -1,11 +1,10 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"server/common"
-	"time"
+	"server/consumer/test"
 )
 
 func initHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,16 +14,12 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	common.CountRequestStart++
+	test.HandlerTest()
 	w.WriteHeader(http.StatusOK)
 }
 
 func infoHandler(w http.ResponseWriter, r *http.Request) {
-	var resp common.ServerResp
-	resp.Request = common.CountRequestRate
-	resp.InitRequest = common.CountRequestInit
-
-	body, err := json.Marshal(resp)
+	body, err := test.HandlerInfo()
 	if err != nil {
 		panic(err)
 	}
@@ -35,22 +30,12 @@ func infoHandler(w http.ResponseWriter, r *http.Request) {
 
 func problemHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
-	fmt.Println("---------------------------------")
-	fmt.Println("This is " + name + "'s connection")
-	fmt.Println("---------------------------------")
+	test.HandlerProblem(name)
 	w.WriteHeader(http.StatusOK)
 }
 
 func measure(w http.ResponseWriter, r *http.Request) {
-	ans := uint64(0)
-	for i := 0; i < 10; i++ {
-		ans = ans + common.CountRequestRate/10
-		time.Sleep(1 * time.Second)
-	}
-	var serverMeasure common.ServerMeasure
-	serverMeasure.Request = ans
-
-	body, err := json.Marshal(serverMeasure)
+	body, err := test.HandlerMeasure()
 	if err != nil {
 		panic(err)
 	}

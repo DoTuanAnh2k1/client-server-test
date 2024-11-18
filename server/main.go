@@ -2,8 +2,13 @@ package main
 
 import (
 	"server/common"
+	rabbitmq "server/consumer/rabbitMQ"
 	"server/server"
 )
+
+func Init() {
+	rabbitmq.Init()
+}
 
 func main() {
 	server := server.NewServer()

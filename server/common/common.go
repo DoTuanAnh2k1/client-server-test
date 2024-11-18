@@ -18,6 +18,8 @@ type ServerMeasure struct {
 	Request uint64 `json:"request"`
 }
 
+const MessageBody = "HeHe"
+
 func UpdateInterval() {
 	for {
 		CountRequestRate = CountRequestStart - CountRequestPrev
