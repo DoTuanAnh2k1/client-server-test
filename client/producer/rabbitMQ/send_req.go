@@ -26,3 +26,17 @@ func sendReq() {
 		)
 	}
 }
+
+func sendOneReq() {
+	body := []byte(common.MessageBody)
+	Channel.Publish(
+		"",        // exchange
+		QueueName, // key
+		false,     // mandatory
+		false,     // immediate
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        body,
+		},
+	)
+}

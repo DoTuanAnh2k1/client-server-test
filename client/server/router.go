@@ -61,10 +61,25 @@ func problemHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func triggerSendOneHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("name")
+	switch name {
+	case RabbitMQ:
+		rabbitmq.TriggerSendOne()
+	case GRPC:
+		grpc.TriggerSendOne()
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/trigger/on", triggerOnHandler)
 	mux.HandleFunc("/trigger/off", triggerOffHandler)
+	mux.HandleFunc("/trigger/one", triggerSendOneHandler)
 	mux.HandleFunc("/prob", problemHandler)
 	return mux
 }

@@ -7,3 +7,7 @@ func TriggerOn() {
 func TriggerOff() {
 	isSend = false
 }
+
+func TriggerSendOne() {
+	sendOneReq()
+}
