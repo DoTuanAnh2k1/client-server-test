@@ -13,8 +13,8 @@ import (
 )
 
 func Init() {
-	serverSvc = utils.GetEnv("ServerPort", "3654")
-	serverPort = utils.GetEnv("ServerSvc", "localhost")
+	serverPort = utils.GetEnv("ServerPort", "3654")
+	serverSvc = utils.GetEnv("ServerSvc", "localhost")
 	initClientList()
 	go sendReq()
 }

@@ -1,0 +1,3 @@
+client/go.mod
+client/go.sum
+client/vendor/*

@@ -1,14 +1,26 @@
 package rabbitmq
 
-import "github.com/streadway/amqp"
+import (
+	"client/utils"
 
-func Init() {
-	Channel, _ = initQueue()
+	"github.com/streadway/amqp"
+)
+
+func Init() error {
+	serverRabbitMQSvc = utils.GetEnv("serverRabbitMQSvc", "localhost")
+	serverRabbitMQPort = utils.GetEnv("ServerRabbitMQPort", "5672")
+	var err error
+	Channel, err = initQueue()
+	if err != nil {
+		return err
+	}
 	go sendReq()
+	return nil
 }
 
 func initQueue() (*amqp.Channel, error) {
-	connection, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	rabbitMQPath := "amqp://guest:guest@" + serverRabbitMQSvc + ":" + serverRabbitMQPort + "/"
+	connection, err := amqp.Dial(rabbitMQPath)
 	if err != nil {
 		return nil, err
 	}
