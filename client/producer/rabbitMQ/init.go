@@ -7,7 +7,7 @@ import (
 )
 
 func Init() error {
-	serverRabbitMQSvc = utils.GetEnv("serverRabbitMQSvc", "localhost")
+	serverRabbitMQSvc = utils.GetEnv("ServerRabbitMQSvc", "localhost")
 	serverRabbitMQPort = utils.GetEnv("ServerRabbitMQPort", "5672")
 	var err error
 	Channel, err = initQueue()
