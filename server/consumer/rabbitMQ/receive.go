@@ -5,7 +5,11 @@ import (
 )
 
 func receive() {
-	for msg := range session.Stream() {
+	messQueue, err := session.Stream()
+	if err != nil {
+		panic(err)
+	}
+	for msg := range messQueue {
 		common.CountRequestStart++
 		if string(msg.Body) == common.MessageBody {
 			common.CountRequestSuccess++

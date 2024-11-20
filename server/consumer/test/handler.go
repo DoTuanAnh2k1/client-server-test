@@ -7,8 +7,11 @@ import (
 	"time"
 )
 
-func HandlerTest() {
+func HandlerTest(body string) {
 	common.CountRequestStart++
+	if body == common.MessageBody {
+		common.CountRequestSuccess++
+	}
 }
 
 func HandlerInfo() ([]byte, error) {

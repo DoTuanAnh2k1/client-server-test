@@ -1,14 +1,12 @@
 package rabbitmq
 
-import "github.com/streadway/amqp"
+import "server/utils"
 
 func Init() {
 	serverRabbitMQSvc = utils.GetEnv("ServerRabbitMQSvc", "localhost")
 	serverRabbitMQPort = utils.GetEnv("ServerRabbitMQPort", "5672")
-	rabbitMQAddr = "amqp://guest:guest@:" + serverRabbitMQSvc + ":" + serverRabbitMQPort + "/"
+	rabbitMQAddr := "amqp://guest:guest@:" + serverRabbitMQSvc + ":" + serverRabbitMQPort + "/"
 	session = NewRabbitMQSession(queueName, rabbitMQAddr)
-	select {
-	case <- session.notifyReady:
-	}
+	<-session.notifyReady
 	go receive()
 }

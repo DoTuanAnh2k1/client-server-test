@@ -19,6 +19,10 @@ spec:
         ports:
         - containerPort: 3654
         - containerPort: 50051
+        resources:
+          limits:
+            cpu: "1"
+            mem: 4Gi
 ---
 apiVersion: v1
 kind: Service
