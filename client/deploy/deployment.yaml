@@ -33,6 +33,10 @@ spec:
           value: "50012"
         ports:
         - containerPort: 3317
+        resources:
+          limits:
+            cpu: "1"
+            mem: 3Gi
 ---
 apiVersion: v1
 kind: Service
