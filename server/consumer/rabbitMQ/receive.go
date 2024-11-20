@@ -14,5 +14,6 @@ func receive() {
 		if string(msg.Body) == common.MessageBody {
 			common.CountRequestSuccess++
 		}
+		msg.Ack(true)
 	}
 }

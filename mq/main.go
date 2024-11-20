@@ -9,6 +9,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 // https://github.com/anthdm/gstream
@@ -18,7 +21,7 @@ const (
 )
 
 const (
-	NumberOfClients = 8
+	NumberOfClients    = 8
 	NumberOfConnection = 8
 )
 
@@ -26,13 +29,13 @@ var QM *QueueManager
 
 var (
 	TickLength uint64 = 4
-	Rate uint64 = 1000
+	Rate       uint64 = 1000
 )
 
 var (
-	indexConsumerRR uint64 = 0
+	indexConsumerRR   uint64 = 0
 	indexConnectionRR uint64 = 0
-	indexClientRR uint64 = 0
+	indexClientRR     uint64 = 0
 )
 
 type Message struct {
@@ -44,26 +47,26 @@ type Message struct {
 }
 
 type Connection struct {
-	Ip string
+	Ip         string
 	ClientList []*http.Client
 }
 
 func (c *Connection) getClientRR() *http.Client {
-	indexClientRR ++
-	return c.ClientList[indexClientRR % uint64(len(c.ClientList))]
+	indexClientRR++
+	return c.ClientList[indexClientRR%uint64(len(c.ClientList))]
 }
 
 type ConsumerInfo struct {
-	Ip string
+	Ip             string
 	ConnectionList []*Connection
 }
 
 func (c *ConsumerInfo) getConnectionRR() *Connection {
 	indexConnectionRR++
-	return c.ConnectionList[indexConnectionRR % uint64(len(c.ConnectionList))]
+	return c.ConnectionList[indexConnectionRR%uint64(len(c.ConnectionList))]
 }
 
-type Queue interface{
+type Queue interface {
 	InitConsumerInfo(string)
 	Producer(Message) error
 	Consumer() error
@@ -72,7 +75,7 @@ type Queue interface{
 
 type QueueManager struct {
 	QueueMap map[string]Queue
-	MuLock *sync.Mutex
+	MuLock   *sync.Mutex
 }
 
 func NewQueueManager() *QueueManager {
@@ -82,12 +85,12 @@ func NewQueueManager() *QueueManager {
 }
 
 type GPRCQueue struct {
-	Name string
+	Name         string
 	MessageQueue []Message
 }
 
 func NewGPRCQueue(name string) *GPRCQueue {
-	return &GPRCQueue {
+	return &GPRCQueue{
 		Name: name,
 	}
 }
@@ -107,17 +110,17 @@ func (gq *GPRCQueue) Len() uint64 {
 }
 
 func (gq *GPRCQueue) InitConsumerInfo(ip string) {
-	
+
 }
 
 type HTTP2Queue struct {
-	Name string
+	Name         string
 	MessageQueue []*Message
 	ConsumerList []*ConsumerInfo
 }
 
 func NewHTTP2Queue(name string) *HTTP2Queue {
-	return &HTTP2Queue {
+	return &HTTP2Queue{
 		Name: name,
 	}
 }
@@ -133,12 +136,12 @@ func (hq *HTTP2Queue) Consumer() error {
 			continue
 		}
 		rate := min(Rate, hq.Len())
-		for i := uint64(0); i < TickLength; i ++ {
+		for i := uint64(0); i < TickLength; i++ {
 			doneFlag := false
-			for j := uint64(0); j < rate / TickLength + 1; j ++ {
+			for j := uint64(0); j < rate/TickLength+1; j++ {
 				if hq.Len() == 0 {
 					doneFlag = true
-					break;
+					break
 				}
 				go hq.DeQueue()
 			}
@@ -152,7 +155,7 @@ func (hq *HTTP2Queue) Consumer() error {
 
 func (hq *HTTP2Queue) getConsumerRR() *ConsumerInfo {
 	indexConsumerRR++
-	return hq.ConsumerList[indexConsumerRR % uint64(len(hq.ConsumerList))]
+	return hq.ConsumerList[indexConsumerRR%uint64(len(hq.ConsumerList))]
 }
 
 func (hq *HTTP2Queue) DeQueue() {
@@ -183,7 +186,7 @@ func (hq *HTTP2Queue) Len() uint64 {
 func (hq *HTTP2Queue) InitConsumerInfo(ip string) {
 	var connectionList []*Connection
 	for i := 0; i < NumberOfConnection; i++ {
-		var clientList []*http.Client	
+		var clientList []*http.Client
 		for j := 0; j < NumberOfClients; j++ {
 			clientList = append(clientList, &http.Client{
 				Transport: &http2.Transport{
@@ -194,13 +197,13 @@ func (hq *HTTP2Queue) InitConsumerInfo(ip string) {
 			})
 		}
 		connectionList = append(connectionList, &Connection{
-			Ip: ip,
+			Ip:         ip,
 			ClientList: clientList,
 		})
 	}
 
 	hq.ConsumerList = append(hq.ConsumerList, &ConsumerInfo{
-		Ip: ip,
+		Ip:             ip,
 		ConnectionList: connectionList,
 	})
 }
@@ -234,7 +237,7 @@ func getMessHandler(w http.ResponseWriter, r *http.Request) {
 		path = "/"
 	}
 
-	mess := Message {
+	mess := Message{
 		Body: body,
 		Path: path,
 		Port: port,
@@ -291,8 +294,8 @@ func newServerHTTP() *http.Server {
 	h2s := http2.Server{}
 	mux := newMuxRouter()
 	return &http.Server{
-		Addr: ":8457",
-		Handler: h2c.NewHandler(mux, h2s),
+		Addr:    ":8457",
+		Handler: h2c.NewHandler(mux, &h2s),
 	}
 }
 
@@ -311,19 +314,19 @@ func main() {
 
 // GetLocalIP returns the non loopback local IP of the host
 func GetLocalIP() string {
-    addrs, err := net.InterfaceAddrs()
-    if err != nil {
-        return ""
-    }
-    for _, address := range addrs {
-        // check the address type and if it is not a loopback the display it
-        if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-            if ipnet.IP.To4() != nil {
-                return ipnet.IP.String()
-            }
-        }
-    }
-    return ""
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+	for _, address := range addrs {
+		// check the address type and if it is not a loopback the display it
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
 }
 
 func min(a, b uint64) uint64 {

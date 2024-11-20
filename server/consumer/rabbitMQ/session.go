@@ -226,7 +226,7 @@ func (session *Session) Stream() (<-chan amqp.Delivery, error) {
 	return session.channel.Consume(
 		session.name,
 		"",    // Consumer
-		true,  // Auto-Ack
+		false, // Auto-Ack
 		false, // Exclusive
 		false, // No-local
 		false, // No-Wait
