@@ -22,4 +22,6 @@ type Connection struct {
 	ClientList []*http.Client
 }
 
-var TickLength int
+var TicketLength int = 2
+
+var Rate int = 1000

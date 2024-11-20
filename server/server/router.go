@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"server/common"
 	"server/consumer/test"
 )
@@ -14,7 +15,8 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	test.HandlerTest()
+	body, _ := os.ReadAll(r.Body)
+	go test.HandlerTest(string(body))
 	w.WriteHeader(http.StatusOK)
 }
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"client/common"
 	"net/http"
 	"time"
@@ -8,13 +9,20 @@ import (
 
 func sendReq() {
 	url := common.Scheme + serverSvc + ":" + serverPort + common.PathTest
+	body := []string(common.MessageBody)
+	req := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(body))
 	for {
 		if !isSvc {
 			time.Sleep(common.TimeSleep * time.Second)
 			continue
 		}
 		client := getClient(clientList)
-		go client.Get(url)
+		for i := 0; i < common.TicketLength; i++ {
+			for j := 0; j < common.Rate / common.TicketLength; j++ {
+				go client.Do(req)
+			}
+			time.Sleep(time.Duration(common.Rate / common.TicketLength) * time.Millisecond)
+		}
 	}
 }
 

@@ -30,7 +30,7 @@ spec:
         - name: ServerRabbitMQPort
           value: "5672"
         - name: ServerGRPCPort
-          value: "50012"
+          value: "50051"
         ports:
         - containerPort: 3317
         resources:

@@ -14,7 +14,12 @@ func sendReq() {
 		}
 		connection := getConnection()
 		client := getClient(connection.ClientList)
-		go client.Get(connection.UrlTest)
+		for i := 0; i < common.TicketLength; i++ {
+			for j := 0; j < common.Rate / common.TicketLength; j++ {
+				go client.Get(connection.UrlTest)
+			}
+			time.Sleep(time.Duration(common.Rate / common.TicketLength) * time.Millisecond)
+		}
 	}
 }
 

@@ -11,6 +11,7 @@ func NewGin() *gin.Engine {
 
 	r.GET("/trigger/on/:name", triggerOn)
 	r.GET("/trigger/off/:name", triggerOff)
+	r.GET("/trigger/one/:name", triggerSendOne)
 	r.GET("/trigger/problem/:name", triggerProblem)
 	r.GET("/trigger/measure", getMeasure)
 

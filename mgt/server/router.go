@@ -6,6 +6,7 @@ import (
 	"io"
 	"mgt/common"
 	"mgt/utils"
+	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -39,11 +40,13 @@ func getInfo(c *gin.Context) {
 		}
 		resp.Body.Close()
 		podInfoList = append(podInfoList, common.PodInfo{
-			Ip:          ip,
+			Ip:          net.ParseIP(ip),
 			NumberOfReq: serverResp.Request,
 			InitRequest: serverResp.InitRequest,
+			SuccessRate: serverResp.SuccessRate,
 		})
 	}
+	sort.Slice(podInfoList, func(i, j int) bool { return podInfoList[i].Ip.String() < podInfoList[j].Ip.String()})
 	c.JSON(200, podInfoList)
 }
 
@@ -84,6 +87,7 @@ func getPodMeasure(wg *sync.WaitGroup, podIp string, podInfoList *[]common.PodIn
 	*podInfoList = append(*podInfoList, common.PodInfo{
 		Ip:          podIp,
 		NumberOfReq: serverResp.Request,
+		SuccessRate: serverResp.SuccessRate,
 	})
 	wg.Done()
 }
@@ -144,6 +148,24 @@ func triggerProblem(c *gin.Context) {
 		url += ClientPathProbReconnect
 	case common.ProblemDo:
 		url += ClientPathProbDo
+	default:
+		c.JSON(http.StatusBadRequest, "name unsupported")
+		return
+	}
+	client := http.Client{}
+	client.Get(url)
+	c.JSON(http.StatusOK, "ok")
+}
+
+func triggerSendOne(c *gin.Context) {
+	url := "http://" + common.ClientSvc + ":" + common.ClientPort + "/trigger/one?name="
+	switch name {
+	case common.RabbitMQ:
+		url += ClientPathRabbitMQ
+	case common.GRPC:
+		url += ClientPathGRPC
+	case common.Kafka:
+		url += ClientPathKafka
 	default:
 		c.JSON(http.StatusBadRequest, "name unsupported")
 		return

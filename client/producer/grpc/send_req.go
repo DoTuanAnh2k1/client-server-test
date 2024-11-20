@@ -13,7 +13,12 @@ func sendReq() {
 			time.Sleep(10 * time.Second)
 			continue
 		}
-		clientGRPC.SayHello(context.Background(), &pb.HelloRequest{Message: common.MessageBody})
+		for i := 0; i < common.TicketLength; i++ {
+			for j := 0; j < common.Rate / common.TicketLength; j++ {
+				go clientGRPC.SayHello(context.Background(), &pb.HelloRequest{Message: common.MessageBody})
+			}
+			time.Sleep(time.Duration(common.Rate / common.TicketLength) * time.Millisecond)
+		}
 	}
 }
 
