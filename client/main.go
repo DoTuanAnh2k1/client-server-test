@@ -12,10 +12,7 @@ func Init() {
 	serviceheadless.Init()
 	service.Init()
 	problem.Init()
-	err := rabbitmq.Init()
-	if err != nil {
-		panic(err)
-	}
+	rabbitmq.Init()
 }
 
 func main() {

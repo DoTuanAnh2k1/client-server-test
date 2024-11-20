@@ -2,23 +2,20 @@ package rabbitmq
 
 import (
 	"errors"
-	"log"
 	"time"
-
-	"github.com/streadway/amqp"
 )
 
 const queueName string = "message"
 
 const (
 	// When reconnecting to the server after connection failure
-	ReconnectDelay = 5 * time.Second
+	reconnectDelay = 5 * time.Second
 
 	// When setting up the channel after a channel exception
-	ReInitDelay = 2 * time.Second
+	reInitDelay = 2 * time.Second
 
 	// When resending messages the server didn't confirm
-	ResendDelay = 5 * time.Second
+	resendDelay = 5 * time.Second
 )
 
 var (

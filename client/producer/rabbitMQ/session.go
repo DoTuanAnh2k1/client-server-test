@@ -1,7 +1,10 @@
 package rabbitmq
 
 import (
+	"errors"
 	"log"
+	"os"
+	"time"
 
 	"github.com/streadway/amqp"
 )
@@ -16,16 +19,16 @@ type Session struct {
 	notifyChanClose chan *amqp.Error
 	notifyConfirm   chan amqp.Confirmation
 	isReady         bool
-	notifyReady 	chan bool
+	notifyReady     chan bool
 }
 
 func NewRabbitMQSession(sessionQueueName string, addr string) *Session {
 	session := Session{
 		logger: log.New(os.Stdout, "", log.LstdFlags),
-		name:   name,
+		name:   sessionQueueName,
 		done:   make(chan bool),
 	}
-	go session.HandleReconnect(addr)
+	go session.handleReconnect(addr)
 	return &session
 }
 func New(name string, addr string) *Session {

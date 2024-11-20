@@ -2,9 +2,8 @@ package rabbitmq
 
 import (
 	"client/common"
+	"fmt"
 	"time"
-
-	"github.com/streadway/amqp"
 )
 
 func sendReq() {
@@ -14,29 +13,14 @@ func sendReq() {
 			time.Sleep(common.TimeSleep * time.Second)
 			continue
 		}
-		Channel.Publish(
-			"",        // exchange
-			QueueName, // key
-			false,     // mandatory
-			false,     // immediate
-			amqp.Publishing{
-				ContentType: "text/plain",
-				Body:        body,
-			},
-		)
+		session.Push(body)
 	}
 }
 
 func sendOneReq() {
 	body := []byte(common.MessageBody)
-	Channel.Publish(
-		"",        // exchange
-		QueueName, // key
-		false,     // mandatory
-		false,     // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        body,
-		},
-	)
+	err := session.Push(body)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
