@@ -21,3 +21,5 @@ type Connection struct {
 	UrlTest    string
 	ClientList []*http.Client
 }
+
+var TickLength int
