@@ -8,6 +8,7 @@ import (
 	"mgt/utils"
 	"net"
 	"net/http"
+	"sort"
 	"sync"
 	"time"
 
@@ -46,7 +47,7 @@ func getInfo(c *gin.Context) {
 			SuccessRate: serverResp.SuccessRate,
 		})
 	}
-	sort.Slice(podInfoList, func(i, j int) bool { return podInfoList[i].Ip.String() < podInfoList[j].Ip.String()})
+	sort.Slice(podInfoList, func(i, j int) bool { return podInfoList[i].Ip.String() < podInfoList[j].Ip.String() })
 	c.JSON(200, podInfoList)
 }
 
@@ -85,7 +86,7 @@ func getPodMeasure(wg *sync.WaitGroup, podIp string, podInfoList *[]common.PodIn
 	}
 	resp.Body.Close()
 	*podInfoList = append(*podInfoList, common.PodInfo{
-		Ip:          podIp,
+		Ip:          net.ParseIP(podIp),
 		NumberOfReq: serverResp.Request,
 		SuccessRate: serverResp.SuccessRate,
 	})
@@ -158,6 +159,7 @@ func triggerProblem(c *gin.Context) {
 }
 
 func triggerSendOne(c *gin.Context) {
+	name := c.Param("name")
 	url := "http://" + common.ClientSvc + ":" + common.ClientPort + "/trigger/one?name="
 	switch name {
 	case common.RabbitMQ:

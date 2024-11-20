@@ -5,3 +5,11 @@ client/vendor/*
 server/go.mod
 server/go.sum
 server/vendor/*
+
+mgt/go.mod
+mgt/go.sum
+mgt/vendor/*
+
+mq/go.mod
+mq/go.sum
+mq/vendor/*
