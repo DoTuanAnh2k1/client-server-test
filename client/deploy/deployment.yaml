@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: client-deploy
   namespace: test
+  label:
+    app: client
 spec:
   selector:
     matchLabels:
@@ -15,12 +17,20 @@ spec:
     spec:
       containers:
       - name: client
-        image: test
+        image: client-image:latest
         env:
         - name: ServerHeadlessSvc
           value: "server-headless-svc"
         - name: ServerPort
           value: "3654"
+        - name: ServerSvc
+          value: "server-svc"
+        - name: ServerRabbitMQSvc
+          value: "server-svc"
+        - name: ServerRabbitMQPort
+          value: "5672"
+        - name: ServerGRPCPort
+          value: "50012"
         ports:
         - containerPort: 3317
 ---
@@ -33,13 +43,8 @@ spec:
   selector:
     app: client
   type: ClusterIP
-  sessionAffinity: None
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 10800
   ports:
   - name: client-port
     protocol: TCP
     port: 3317
-    targetPort: 3317 
-    nodePort: 3317
+    targetPort: 3317
