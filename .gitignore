@@ -13,3 +13,7 @@ mgt/vendor/*
 mq/go.mod
 mq/go.sum
 mq/vendor/*
+
+rabbit-test/go.mod
+rabbit-test/go.sum
+rabbit-test/vendor/*
