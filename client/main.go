@@ -16,7 +16,7 @@ func Init() {
 }
 
 func main() {
-	Init()
+	go Init()
 
 	clientServer := server.NewServer()
 	err := clientServer.ListenAndServe()

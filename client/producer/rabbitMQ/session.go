@@ -19,22 +19,13 @@ type Session struct {
 	notifyChanClose chan *amqp.Error
 	notifyConfirm   chan amqp.Confirmation
 	isReady         bool
-	notifyReady     chan bool
+	NotifyReady     chan bool
 }
 
 func NewRabbitMQSession(sessionQueueName string, addr string) *Session {
 	session := Session{
 		logger: log.New(os.Stdout, "", log.LstdFlags),
 		name:   sessionQueueName,
-		done:   make(chan bool),
-	}
-	go session.handleReconnect(addr)
-	return &session
-}
-func New(name string, addr string) *Session {
-	session := Session{
-		logger: log.New(os.Stdout, "", log.LstdFlags),
-		name:   name,
 		done:   make(chan bool),
 	}
 	go session.handleReconnect(addr)
@@ -139,7 +130,7 @@ func (session *Session) init(conn *amqp.Connection) error {
 
 	session.changeChannel(ch)
 	session.isReady = true
-	session.notifyReady <- true
+	session.NotifyReady <- true
 	log.Println("Setup!")
 
 	return nil
@@ -186,7 +177,7 @@ func (session *Session) Push(data []byte) error {
 		select {
 		case confirm := <-session.notifyConfirm:
 			if confirm.Ack {
-				session.logger.Println("Push confirmed!")
+				// session.logger.Println("Push confirmed!")
 				return nil
 			}
 		case <-time.After(resendDelay):

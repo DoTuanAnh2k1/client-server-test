@@ -10,7 +10,7 @@ func NewClient(id int) {
 	queueName := "queue"
 	rabbitMQAddr := "amqp://guest:guest@localhost:5672/"
 	message := "message"
-	session := session.New(queueName, rabbitMQAddr)
+	session := session.NewRabbitMQSession(queueName, rabbitMQAddr)
 	// select {
 	// case <-session.NotifyReady:
 	// }

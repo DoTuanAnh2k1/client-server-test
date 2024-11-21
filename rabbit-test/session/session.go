@@ -48,15 +48,6 @@ func NewRabbitMQSession(sessionQueueName string, addr string) *Session {
 	go session.handleReconnect(addr)
 	return &session
 }
-func New(name string, addr string) *Session {
-	session := Session{
-		logger: log.New(os.Stdout, "", log.LstdFlags),
-		name:   name,
-		done:   make(chan bool),
-	}
-	go session.handleReconnect(addr)
-	return &session
-}
 
 // handleReconnect will wait for a connection error on
 // notifyConnClose, and then continuously attempt to reconnect.

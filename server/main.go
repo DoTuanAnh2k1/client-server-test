@@ -11,6 +11,7 @@ func Init() {
 }
 
 func main() {
+	go Init()
 	server := server.NewServer()
 	go common.UpdateInterval()
 	err := server.ListenAndServe()

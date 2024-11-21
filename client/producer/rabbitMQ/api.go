@@ -1,5 +1,7 @@
 package rabbitmq
 
+import "log"
+
 func TriggerOn() {
 	isSend = true
 }
@@ -9,5 +11,6 @@ func TriggerOff() {
 }
 
 func TriggerSendOne() {
+	log.Println("Sending One mess to rabbit MQ")
 	sendOneReq()
 }

@@ -9,7 +9,7 @@ import (
 func NewServer(id int) {
 	queueName := "queue"
 	rabbitMQAddr := "amqp://guest:guest@localhost:5672/"
-	session := session.New(queueName, rabbitMQAddr)
+	session := session.NewRabbitMQSession(queueName, rabbitMQAddr)
 	// select {
 	// case <-session.NotifyReady:
 	// }

@@ -73,6 +73,7 @@ func triggerSendOneHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
 }
 
 func newRouter() *http.ServeMux {
