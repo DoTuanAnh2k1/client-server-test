@@ -1,31 +1,30 @@
-package rabbitmq
+package kafka
 
 import (
 	"client/common"
+	"context"
 	"log"
 	"time"
 )
 
-func sendReq() {
-	body := []byte(common.MessageBody)
+func sendreq() {
 	for {
 		if !isSend {
-			time.Sleep(common.TimeSleep * time.Second)
+			time.Sleep(10 * time.Second)
 			continue
 		}
 		for i := 0; i < common.TicketLength; i++ {
 			for j := 0; j < common.Rate/common.TicketLength; j++ {
-				go session.Push(body)
+				go writer.WriteMessages(context.Background(), message)
 			}
 			time.Sleep(time.Duration(common.Rate/common.TicketLength) * time.Millisecond)
 		}
 	}
 }
 
-func sendOneReq() {
-	body := []byte(common.MessageBody)
-	err := session.Push(body)
+func sendOne() {
+	err := writer.WriteMessages(context.Background(), message)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Failed to write message: %v", err)
 	}
 }

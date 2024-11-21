@@ -3,6 +3,7 @@ package main
 import (
 	"client/problem"
 	"client/producer/grpc"
+	"client/producer/kafka"
 	rabbitmq "client/producer/rabbitMQ"
 	"client/producer/service"
 	serviceheadless "client/producer/service_headless"
@@ -15,6 +16,7 @@ func Init() {
 	problem.Init()
 	rabbitmq.Init()
 	grpc.Init()
+	kafka.Init()
 }
 
 func main() {

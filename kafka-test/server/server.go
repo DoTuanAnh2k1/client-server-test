@@ -15,10 +15,10 @@ func NewServer(id int) {
 
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{brokerAddress},
-		GroupID:  groupID, 
-		Topic:    topic,   
-		MinBytes: 10e3,    
-		MaxBytes: 10e6,    
+		GroupID:  groupID,
+		Topic:    topic,
+		MinBytes: 10e3,
+		MaxBytes: 10e6,
 		MaxWait:  500 * time.Millisecond,
 	})
 

@@ -2,12 +2,14 @@ package main
 
 import (
 	"server/common"
+	"server/consumer/kafka"
 	rabbitmq "server/consumer/rabbitMQ"
 	"server/server"
 )
 
 func Init() {
 	rabbitmq.Init()
+	kafka.Init()
 }
 
 func main() {

@@ -3,6 +3,7 @@ package server
 import (
 	"client/problem"
 	"client/producer/grpc"
+	"client/producer/kafka"
 	rabbitmq "client/producer/rabbitMQ"
 	"client/producer/service"
 	serviceheadless "client/producer/service_headless"
@@ -20,11 +21,14 @@ func triggerOnHandler(w http.ResponseWriter, r *http.Request) {
 		rabbitmq.TriggerOn()
 	case GRPC:
 		grpc.TriggerOn()
+	case Kafka:
+		kafka.TriggerOn()
 	default:
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
 }
 
 func triggerOffHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,11 +42,14 @@ func triggerOffHandler(w http.ResponseWriter, r *http.Request) {
 		rabbitmq.TriggerOff()
 	case GRPC:
 		grpc.TriggerOff()
+	case Kafka:
+		kafka.TriggerOff()
 	default:
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
 }
 
 func problemHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,6 +66,7 @@ func problemHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
 }
 
 func triggerSendOneHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +76,8 @@ func triggerSendOneHandler(w http.ResponseWriter, r *http.Request) {
 		rabbitmq.TriggerSendOne()
 	case GRPC:
 		grpc.TriggerSendOne()
+	case Kafka:
+		kafka.TriggerSendOne()
 	default:
 		w.WriteHeader(http.StatusBadRequest)
 		return
