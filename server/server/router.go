@@ -1,8 +1,8 @@
 package server
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"server/common"
 	"server/consumer/test"
@@ -10,7 +10,7 @@ import (
 
 func initHandler(w http.ResponseWriter, r *http.Request) {
 	common.CountRequestInit++
-	fmt.Println("Init Handler #", common.CountRequestInit)
+	log.Println("Init Handler #", common.CountRequestInit)
 	w.WriteHeader(http.StatusOK)
 }
 

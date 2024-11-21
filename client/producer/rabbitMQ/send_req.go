@@ -2,7 +2,7 @@ package rabbitmq
 
 import (
 	"client/common"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -21,6 +21,6 @@ func sendOneReq() {
 	body := []byte(common.MessageBody)
 	err := session.Push(body)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }

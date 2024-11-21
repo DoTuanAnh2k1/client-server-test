@@ -1,7 +1,7 @@
 package server
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"server/consumer/grpc"
 	"server/utils"
@@ -13,7 +13,7 @@ import (
 func NewServer() *http.Server {
 	grpc.Init()
 	port := utils.GetEnv("Port", "3654")
-	fmt.Println("Running server at http://127.0.0.1:" + port)
+	log.Println("Running server at http://127.0.0.1:" + port)
 	h2s := http2.Server{}
 	mux := newRouter()
 	return &http.Server{

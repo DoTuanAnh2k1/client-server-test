@@ -2,7 +2,7 @@ package serviceheadless
 
 import (
 	"client/utils"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -26,9 +26,9 @@ func scanIp() {
 			}
 		}
 		if !isExist {
-			fmt.Println("Remove Connection: ", connection.Ip)
+			log.Println("Remove Connection: ", connection.Ip)
 			connectionList = append(connectionList[:i], connectionList[i+1:]...)
-			fmt.Println("Connection List: ", connectionList)
+			log.Println("Connection List: ", connectionList)
 			i--
 		}
 	}
@@ -43,10 +43,10 @@ func scanIp() {
 			}
 		}
 		if !isActive {
-			fmt.Println("Add Connection: ", ip)
+			log.Println("Add Connection: ", ip)
 			connection := InitConnection(ip, serverPort)
 			connectionList = append(connectionList, connection)
-			fmt.Println("Connection List: ", connectionList)
+			log.Println("Connection List: ", connectionList)
 		}
 	}
 }

@@ -2,7 +2,7 @@ package test
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"server/common"
 	"time"
 )
@@ -27,9 +27,9 @@ func HandlerInfo() ([]byte, error) {
 }
 
 func HandlerProblem(name string) {
-	fmt.Println("---------------------------------")
-	fmt.Println("This is " + name + "'s connection")
-	fmt.Println("---------------------------------")
+	log.Println("---------------------------------")
+	log.Println("This is " + name + "'s connection")
+	log.Println("---------------------------------")
 }
 
 func HandlerMeasure() ([]byte, error) {
