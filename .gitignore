@@ -21,3 +21,7 @@ rabbit-test/vendor/*
 kafka-test/go.mod
 kafka-test/go.sum
 kafka-test/vendor/*
+
+grpc-test/go.mod
+grpc-test/go.sum
+grpc-test/vendor/*
