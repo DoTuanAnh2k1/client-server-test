@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"log"
 	"net"
 	pb "server/consumer/grpc/proto"
 	"server/utils"
@@ -21,7 +22,7 @@ func InitServerGRPC() error {
 
 	serverGRPC = grpc.NewServer()
 	pb.RegisterMyServiceServer(serverGRPC, &server{})
-
+	log.Println("Start gRPC server at " + serverGRPCPort)
 	if err := serverGRPC.Serve(lis); err != nil {
 		panic(err)
 	}

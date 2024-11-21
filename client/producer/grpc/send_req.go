@@ -4,6 +4,7 @@ import (
 	"client/common"
 	pb "client/producer/grpc/proto"
 	"context"
+	"log"
 	"time"
 )
 
@@ -14,14 +15,18 @@ func sendReq() {
 			continue
 		}
 		for i := 0; i < common.TicketLength; i++ {
-			for j := 0; j < common.Rate / common.TicketLength; j++ {
+			for j := 0; j < common.Rate/common.TicketLength; j++ {
 				go clientGRPC.SayHello(context.Background(), &pb.HelloRequest{Message: common.MessageBody})
 			}
-			time.Sleep(time.Duration(common.Rate / common.TicketLength) * time.Millisecond)
+			time.Sleep(time.Duration(common.Rate/common.TicketLength) * time.Millisecond)
 		}
 	}
 }
 
 func sendOneReq() {
-	clientGRPC.SayHello(context.Background(), &pb.HelloRequest{Message: common.MessageBody})
+	resp, err := clientGRPC.SayHello(context.Background(), &pb.HelloRequest{Message: common.MessageBody})
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println("Resp grpc: ", resp.Message)
 }

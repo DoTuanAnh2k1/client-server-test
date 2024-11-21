@@ -3,6 +3,7 @@ package grpc
 import (
 	pb "client/producer/grpc/proto"
 	"client/utils"
+	"log"
 
 	"google.golang.org/grpc"
 )
@@ -24,9 +25,11 @@ func Init() error {
 
 func InitClient() error {
 	url := serverSvc + ":" + serverGRPCPort
-	clientConnection, err := grpc.NewClient(url)
+	log.Println("Init gRPC connection to: ", url)
+	clientConnection, err := grpc.NewClient(url, grpc.WithInsecure())
 	if err != nil {
-		return nil
+		log.Println(err)
+		return err
 	}
 
 	clientGRPC = pb.NewMyServiceClient(clientConnection)

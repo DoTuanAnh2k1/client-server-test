@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
 	pb "grpc-test/proto"
 	"net"
 	"time"
+
+	"google.golang.org/grpc"
 )
 
 type server struct {
@@ -22,8 +23,8 @@ func (s *server) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloR
 // export PATH=$PATH:/$GO_PATH/bin
 
 func NewClient() {
-	url := "http://localhost:50051"
-	clientConnection, err := grpc.NewClient(url)
+	url := "localhost:50051"
+	clientConnection, err := grpc.NewClient(url, grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
