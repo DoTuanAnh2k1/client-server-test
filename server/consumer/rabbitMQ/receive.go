@@ -12,6 +12,7 @@ func receive() {
 	for msg := range messQueue {
 		common.CountRequestStart++
 		if string(msg.Body) == common.MessageBody {
+			// log.Println(string(msg.Body))
 			common.CountRequestSuccess++
 		}
 		msg.Ack(true)
