@@ -17,3 +17,7 @@ mq/vendor/*
 rabbit-test/go.mod
 rabbit-test/go.sum
 rabbit-test/vendor/*
+
+kafka-test/go.mod
+kafka-test/go.sum
+kafka-test/vendor/*
