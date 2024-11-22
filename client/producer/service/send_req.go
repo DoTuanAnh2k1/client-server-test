@@ -10,7 +10,6 @@ import (
 func sendReq() {
 	url := common.Scheme + serverSvc + ":" + serverPort + common.PathTest
 	body := []byte(common.MessageBody)
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(body))
 
 	for {
 		if !isSvc {
@@ -20,7 +19,10 @@ func sendReq() {
 		client := getClient(clientList)
 		for i := 0; i < common.TicketLength; i++ {
 			for j := 0; j < common.Rate/common.TicketLength; j++ {
-				go client.Do(req)
+				go func() {
+					req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(body))
+					client.Do(req)
+				}()
 			}
 			time.Sleep(time.Duration(common.Rate/common.TicketLength) * time.Millisecond)
 		}
