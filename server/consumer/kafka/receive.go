@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"log"
+	"server/common"
 )
 
 func receive() {
@@ -10,6 +11,10 @@ func receive() {
 		msg, err := reader.ReadMessage(context.Background())
 		if err != nil {
 			log.Fatalf("Error while receiving message: %v", err)
+		}
+		common.CountRequestStart ++
+		if string(msg.Value) == common.MessageBody {
+			common.CountRequestSuccess ++
 		}
 
 		log.Printf("received message from kafka on %s: %s\n", msg.Topic, string(msg.Value))

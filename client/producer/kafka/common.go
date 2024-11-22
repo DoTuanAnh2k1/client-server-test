@@ -1,6 +1,9 @@
 package kafka
 
-import "github.com/segmentio/kafka-go"
+import (
+	"client/common"
+	"github.com/segmentio/kafka-go"
+)
 
 const Topic = "queue"
 
@@ -13,7 +16,7 @@ var (
 	writer  kafka.Writer
 	message = kafka.Message{
 		Key:   []byte("key-A"),
-		Value: []byte("Hello, Kafka Segmentio!"),
+		Value: []byte(common.MessageBody),
 	}
 )
 
