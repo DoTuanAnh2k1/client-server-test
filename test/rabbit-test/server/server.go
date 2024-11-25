@@ -22,5 +22,7 @@ func NewServer(id int) {
 	for msg := range msgQueue {
 		fmt.Printf("server %d mess: %s\n", id, string(msg.Body))
 		msg.Ack(true)
+		break
 	}
+	session.Close()
 }

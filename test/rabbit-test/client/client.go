@@ -15,14 +15,21 @@ func NewClient(id int) {
 	// case <-session.NotifyReady:
 	// }
 	fmt.Println("client ready")
-	i := 0
-	for {
-		time.Sleep(1 * time.Second)
-		tmp := []byte(fmt.Sprintf("%s %d from client %d", message, i, id))
-		i++
-		err := session.Push(tmp)
-		if err != nil {
-			panic(err)
-		}
+	// i := 0
+	// for {
+	// 	time.Sleep(1 * time.Second)
+	// 	tmp := []byte(fmt.Sprintf("%s %d from client %d", message, i, id))
+	// 	i++
+	// 	err := session.Push(tmp)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// }
+	time.Sleep(1 * time.Second)
+	tmp := []byte(fmt.Sprintf("%s %d from client %d", message, 0, id))
+	err := session.Push(tmp)
+	if err != nil {
+		panic(err)
 	}
+	session.Close()
 }

@@ -14,14 +14,14 @@ mq/go.mod
 mq/go.sum
 mq/vendor/*
 
-rabbit-test/go.mod
-rabbit-test/go.sum
-rabbit-test/vendor/*
+test/rabbit-test/go.mod
+test/rabbit-test/go.sum
+test/rabbit-test/vendor/*
 
-kafka-test/go.mod
-kafka-test/go.sum
-kafka-test/vendor/*
+test/kafka-test/go.mod
+test/kafka-test/go.sum
+test/kafka-test/vendor/*
 
-grpc-test/go.mod
-grpc-test/go.sum
-grpc-test/vendor/*
+test/grpc-test/go.mod
+test/grpc-test/go.sum
+test/grpc-test/vendor/*

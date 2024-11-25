@@ -16,6 +16,6 @@ func InitClient() {
 
 func main() {
 	InitClient()
-	go server.NewServer(1)
-	server.NewServer(2)
+	// go server.NewServer(1)
+	server.NewServer(1)
 }
