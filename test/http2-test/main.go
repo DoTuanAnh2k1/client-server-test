@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"sync"
 	"time"
 
 	"golang.org/x/net/http2"
@@ -53,10 +54,34 @@ func newServerVersion2() *http.Server {
 func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", reqHandler)
+	mux.HandleFunc("/5", reqDelay5sHandler)
+	mux.HandleFunc("/10", reqDelay10sHandler)
+	mux.HandleFunc("/15", reqDelay15sHandler)
 	return mux
 }
 
 func reqHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}
+
+func reqDelay5sHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("5 second delay")
+	time.Sleep(5 * time.Second)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}
+
+func reqDelay10sHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("10 second delay")
+	time.Sleep(10 * time.Second)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}
+
+func reqDelay15sHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("15 second delay")
+	time.Sleep(15 * time.Second)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -90,9 +115,42 @@ func dial(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn,
 	return net.Dial(network, addr)
 }
 
-func main() {
+func multiflexingTest() {
+	c1 := &http.Client{
+		Transport: &http2.Transport{
+			AllowHTTP:          true,
+			DisableCompression: true,
+			DialTLSContext:     dial,
+		},
+		Timeout: 2 * time.Second,
+	}
 	go NewHTTPServer(HTTPVersion2)
-	// go NewHTTPServer(HTTPVersion1)
-	// NewClientVer2()
-	NewClientVer1()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		c1.Get("http://localhost:8457/15")
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		c1.Get("http://localhost:8457/10")
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		c1.Get("http://localhost:8457/5")
+		wg.Done()
+	}()
+
+	wg.Wait()
+}
+
+func main() {
+	// go NewHTTPServer(HTTPVersion2)
+	// // go NewHTTPServer(HTTPVersion1)
+	// // NewClientVer2()
+	// NewClientVer1()
+	multiflexingTest()
 }
