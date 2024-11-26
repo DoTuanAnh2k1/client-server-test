@@ -25,3 +25,7 @@ test/kafka-test/vendor/*
 test/grpc-test/go.mod
 test/grpc-test/go.sum
 test/grpc-test/vendor/*
+
+test/http2-test/go.mod
+test/http2-test/go.sum
+test/http2-test/vendor/*
