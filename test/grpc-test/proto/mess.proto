@@ -6,6 +6,9 @@ package proto;
 
 service MyService {
   rpc SayHello (HelloRequest) returns (HelloResponse);
+  rpc SayHelloServerStream (HelloRequest) returns (stream HelloResponse);
+  rpc SayHelloClientStream (stream HelloRequest) returns (HelloResponse);
+  rpc SayHelloBidirectional (stream HelloRequest) returns (stream HelloResponse);
 }
 
 message HelloRequest {

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.20.3
-// source: producer/grpc/proto/mess.proto
+// source: proto/mess.proto
 
 package proto
 
@@ -19,7 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MyService_SayHello_FullMethodName = "/proto.MyService/SayHello"
+	MyService_SayHello_FullMethodName              = "/proto.MyService/SayHello"
+	MyService_SayHelloServerStream_FullMethodName  = "/proto.MyService/SayHelloServerStream"
+	MyService_SayHelloClientStream_FullMethodName  = "/proto.MyService/SayHelloClientStream"
+	MyService_SayHelloBidirectional_FullMethodName = "/proto.MyService/SayHelloBidirectional"
 )
 
 // MyServiceClient is the client API for MyService service.
@@ -27,6 +30,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MyServiceClient interface {
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+	SayHelloServerStream(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HelloResponse], error)
+	SayHelloClientStream(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[HelloRequest, HelloResponse], error)
+	SayHelloBidirectional(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[HelloRequest, HelloResponse], error)
 }
 
 type myServiceClient struct {
@@ -47,11 +53,59 @@ func (c *myServiceClient) SayHello(ctx context.Context, in *HelloRequest, opts .
 	return out, nil
 }
 
+func (c *myServiceClient) SayHelloServerStream(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HelloResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &MyService_ServiceDesc.Streams[0], MyService_SayHelloServerStream_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[HelloRequest, HelloResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MyService_SayHelloServerStreamClient = grpc.ServerStreamingClient[HelloResponse]
+
+func (c *myServiceClient) SayHelloClientStream(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[HelloRequest, HelloResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &MyService_ServiceDesc.Streams[1], MyService_SayHelloClientStream_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[HelloRequest, HelloResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MyService_SayHelloClientStreamClient = grpc.ClientStreamingClient[HelloRequest, HelloResponse]
+
+func (c *myServiceClient) SayHelloBidirectional(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[HelloRequest, HelloResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &MyService_ServiceDesc.Streams[2], MyService_SayHelloBidirectional_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[HelloRequest, HelloResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MyService_SayHelloBidirectionalClient = grpc.BidiStreamingClient[HelloRequest, HelloResponse]
+
 // MyServiceServer is the server API for MyService service.
 // All implementations must embed UnimplementedMyServiceServer
 // for forward compatibility.
 type MyServiceServer interface {
 	SayHello(context.Context, *HelloRequest) (*HelloResponse, error)
+	SayHelloServerStream(*HelloRequest, grpc.ServerStreamingServer[HelloResponse]) error
+	SayHelloClientStream(grpc.ClientStreamingServer[HelloRequest, HelloResponse]) error
+	SayHelloBidirectional(grpc.BidiStreamingServer[HelloRequest, HelloResponse]) error
 	mustEmbedUnimplementedMyServiceServer()
 }
 
@@ -64,6 +118,15 @@ type UnimplementedMyServiceServer struct{}
 
 func (UnimplementedMyServiceServer) SayHello(context.Context, *HelloRequest) (*HelloResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
+}
+func (UnimplementedMyServiceServer) SayHelloServerStream(*HelloRequest, grpc.ServerStreamingServer[HelloResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method SayHelloServerStream not implemented")
+}
+func (UnimplementedMyServiceServer) SayHelloClientStream(grpc.ClientStreamingServer[HelloRequest, HelloResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method SayHelloClientStream not implemented")
+}
+func (UnimplementedMyServiceServer) SayHelloBidirectional(grpc.BidiStreamingServer[HelloRequest, HelloResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method SayHelloBidirectional not implemented")
 }
 func (UnimplementedMyServiceServer) mustEmbedUnimplementedMyServiceServer() {}
 func (UnimplementedMyServiceServer) testEmbeddedByValue()                   {}
@@ -104,6 +167,31 @@ func _MyService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MyService_SayHelloServerStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(HelloRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(MyServiceServer).SayHelloServerStream(m, &grpc.GenericServerStream[HelloRequest, HelloResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MyService_SayHelloServerStreamServer = grpc.ServerStreamingServer[HelloResponse]
+
+func _MyService_SayHelloClientStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MyServiceServer).SayHelloClientStream(&grpc.GenericServerStream[HelloRequest, HelloResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MyService_SayHelloClientStreamServer = grpc.ClientStreamingServer[HelloRequest, HelloResponse]
+
+func _MyService_SayHelloBidirectional_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MyServiceServer).SayHelloBidirectional(&grpc.GenericServerStream[HelloRequest, HelloResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MyService_SayHelloBidirectionalServer = grpc.BidiStreamingServer[HelloRequest, HelloResponse]
+
 // MyService_ServiceDesc is the grpc.ServiceDesc for MyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -116,6 +204,23 @@ var MyService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MyService_SayHello_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "producer/grpc/proto/mess.proto",
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "SayHelloServerStream",
+			Handler:       _MyService_SayHelloServerStream_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "SayHelloClientStream",
+			Handler:       _MyService_SayHelloClientStream_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "SayHelloBidirectional",
+			Handler:       _MyService_SayHelloBidirectional_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "proto/mess.proto",
 }
