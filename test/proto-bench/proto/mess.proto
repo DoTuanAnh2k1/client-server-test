@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+package proto;
+
+// Enum example
+enum TestEnum {
+  UNKNOWN = 0;
+  OPTION_ONE = 1;
+  OPTION_TWO = 2;
+  OPTION_THREE = 3;
+}
+
+// Nested message example
+message NestedMessage {
+  int32 nested_id = 1;
+  string nested_name = 2;
+  repeated float nested_values = 3;
+}
+
+// Main message with 100+ fields
+message BenchmarkMessage {
+  // Primitive types
+  int32 field_1 = 1;
+  int64 field_2 = 2;
+  uint32 field_3 = 3;
+  uint64 field_4 = 4;
+  sint32 field_5 = 5;
+  sint64 field_6 = 6;
+  fixed32 field_7 = 7;
+  fixed64 field_8 = 8;
+  sfixed32 field_9 = 9;
+  sfixed64 field_10 = 10;
+  float field_11 = 11;
+  double field_12 = 12;
+  bool field_13 = 13;
+  string field_14 = 14;
+
+  // Enum field
+  TestEnum field_15 = 15;
+
+  // Nested message
+  NestedMessage field_16 = 16;
+
+  // Repeated fields
+  repeated int32 field_17 = 17;
+  repeated string field_18 = 18;
+
+  // Map field
+  map<string, int32> field_19 = 19;
+
+  // More primitive fields for benchmark
+  string field_20 = 20;
+  int32 field_21 = 21;
+  int64 field_22 = 22;
+  uint32 field_23 = 23;
+  uint64 field_24 = 24;
+  sint32 field_25 = 25;
+  sint64 field_26 = 26;
+  bool field_27 = 27;
+  float field_28 = 28;
+  double field_29 = 29;
+  fixed32 field_30 = 30;
+  fixed64 field_31 = 31;
+  sfixed32 field_32 = 32;
+  sfixed64 field_33 = 33;
+  string field_34 = 34;
+  bytes field_35 = 35;
+
+  // Adding some extra nested and repeated fields
+  repeated NestedMessage field_36 = 36;
+
+  map<int32, NestedMessage> field_37 = 37;
+
+  // Fill up to 100+ fields
+  int32 field_38 = 38;
+  int64 field_39 = 39;
+  uint32 field_40 = 40;
+  uint64 field_41 = 41;
+  sint32 field_42 = 42;
+  sint64 field_43 = 43;
+  fixed32 field_44 = 44;
+  fixed64 field_45 = 45;
+  sfixed32 field_46 = 46;
+  sfixed64 field_47 = 47;
+  float field_48 = 48;
+  double field_49 = 49;
+  bool field_50 = 50;
+  string field_51 = 51;
+  string field_52 = 52;
+  string field_53 = 53;
+  string field_54 = 54;
+  string field_55 = 55;
+  int32 field_56 = 56;
+  int64 field_57 = 57;
+  uint32 field_58 = 58;
+  uint64 field_59 = 59;
+  sint32 field_60 = 60;
+  sint64 field_61 = 61;
+  bool field_62 = 62;
+  float field_63 = 63;
+  double field_64 = 64;
+  fixed32 field_65 = 65;
+  fixed64 field_66 = 66;
+  sfixed32 field_67 = 67;
+  sfixed64 field_68 = 68;
+  string field_69 = 69;
+  bytes field_70 = 70;
+  TestEnum field_71 = 71;
+  NestedMessage field_72 = 72;
+
+  repeated int32 field_73 = 73;
+  repeated string field_74 = 74;
+  repeated bool field_75 = 75;
+  repeated float field_76 = 76;
+  repeated double field_77 = 77;
+  repeated bytes field_78 = 78;
+
+  map<string, NestedMessage> field_79 = 79;
+  map<int32, string> field_80 = 80;
+
+  string field_81 = 81;
+  int32 field_82 = 82;
+  int64 field_83 = 83;
+  uint32 field_84 = 84;
+  uint64 field_85 = 85;
+  sint32 field_86 = 86;
+  sint64 field_87 = 87;
+  fixed32 field_88 = 88;
+  fixed64 field_89 = 89;
+  sfixed32 field_90 = 90;
+  sfixed64 field_91 = 91;
+  float field_92 = 92;
+  double field_93 = 93;
+  bool field_94 = 94;
+  string field_95 = 95;
+
+  repeated string field_96 = 96;
+  repeated bool field_97 = 97;
+  repeated double field_98 = 98;
+
+  NestedMessage field_99 = 99;
+  TestEnum field_100 = 100;
+}

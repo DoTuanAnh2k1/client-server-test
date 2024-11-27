@@ -12,12 +12,12 @@ func receive() {
 		if err != nil {
 			log.Fatalf("Error while receiving message: %v", err)
 		}
-		common.CountRequestStart ++
+		common.CountRequestStart++
 		if string(msg.Value) == common.MessageBody {
-			common.CountRequestSuccess ++
+			common.CountRequestSuccess++
 		}
 
-		log.Printf("received message from kafka on %s: %s\n", msg.Topic, string(msg.Value))
+		// log.Printf("received message from kafka on %s: %s\n", msg.Topic, string(msg.Value))
 		// log.Printf("Message received: Key=%s, Value=%s, Partition=%d, Offset=%d\n",
 		// 	string(msg.Key), string(msg.Value), msg.Partition, msg.Offset)
 	}

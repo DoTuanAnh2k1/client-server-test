@@ -29,3 +29,7 @@ test/grpc-test/vendor/*
 test/http2-test/go.mod
 test/http2-test/go.sum
 test/http2-test/vendor/*
+
+test/proto-bench/go.mod
+test/proto-bench/go.sum
+test/proto-bench/vendor/*
