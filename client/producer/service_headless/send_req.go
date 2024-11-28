@@ -14,16 +14,15 @@ func sendReq() {
 			time.Sleep(common.TimeSleep * time.Second)
 			continue
 		}
-		connection := getConnection()
-		client := getClient(connection.ClientList)
-		for i := 0; i < common.TicketLength; i++ {
-			for j := 0; j < common.Rate/common.TicketLength; j++ {
-				go func() {
-					req, _ := http.NewRequest(http.MethodPost, connection.UrlTest, bytes.NewBuffer(body))
-					client.Do(req)
-				}()
-			}
-			time.Sleep(time.Duration(common.Rate/common.TicketLength) * time.Millisecond)
+		
+		for i := 0; i < common.TicketLength * common.Rate / 1000; i ++ {
+			go func() {
+				connection := getConnection()
+				client := getClient(connection.ClientList)
+				req, _ := http.NewRequest(http.MethodPost, connection.UrlTest, bytes.NewBuffer(body))
+				client.Do(req)
+			}()
+			time.Sleep(time.Duration(common.TicketLength) * time.Millisecond)
 		}
 	}
 }

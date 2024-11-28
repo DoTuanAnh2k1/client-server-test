@@ -13,11 +13,9 @@ func sendReq() {
 			time.Sleep(common.TimeSleep * time.Second)
 			continue
 		}
-		for i := 0; i < common.TicketLength; i++ {
-			for j := 0; j < common.Rate/common.TicketLength; j++ {
-				go session.Push(body)
-			}
-			time.Sleep(time.Duration(common.Rate/common.TicketLength) * time.Millisecond)
+		for i := 0; i < common.TicketLength * common.Rate / 1000; i ++ {
+			go session.Push(body)
+			time.Sleep(time.Duration(common.TicketLength) * time.Millisecond)
 		}
 	}
 }

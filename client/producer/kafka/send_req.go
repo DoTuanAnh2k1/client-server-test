@@ -13,10 +13,10 @@ func sendreq() {
 			time.Sleep(10 * time.Second)
 			continue
 		}
-		for i := 0; i < common.Rate*common.TicketLength/1000; i++ {
-			go writer.WriteMessages(context.Background(), message)
+		for i := 0; i < common.TicketLength * common.Rate / 1000; i ++ {
+			go session.Push(body)
+			time.Sleep(time.Duration(common.TicketLength) * time.Millisecond)
 		}
-		time.Sleep(time.Duration(common.Rate*common.TicketLength) * time.Millisecond)
 	}
 }
 

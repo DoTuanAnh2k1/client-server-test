@@ -289,10 +289,6 @@ var (
 
 		Field99:  jsonPkg.NestedMessage{NestedID: 9, NestedName: "Nested99", NestedValues: []float32{20.2, 21.21}},
 		Field100: jsonPkg.TestEnum_OPTION_THREE,
-
-		// Timestamps
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 )
 

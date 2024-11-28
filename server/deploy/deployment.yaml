@@ -16,6 +16,15 @@ spec:
       containers:
       - name: server
         image: server-image:latest
+        env: 
+          - name: ServerRabbitMQSvc
+            value: "rabbit-mq-svc"
+          - name: ServerRabbitMQPort
+            value: "5672"
+          - name: ServerKafkaSvc
+            value: "kafka-svc"
+          - name: ServerKafkaPort
+            value: 9092
         ports:
         - containerPort: 3654
         - containerPort: 50051
@@ -48,8 +57,6 @@ metadata:
   namespace: test
 spec:
   type: ClusterIP
-  externalIPs:
-    - 10.55.110.176
   selector:
     app: server
   ports:

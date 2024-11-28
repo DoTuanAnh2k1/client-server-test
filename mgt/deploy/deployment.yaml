@@ -21,8 +21,12 @@ spec:
           value: "server-headless-svc"
         - name: ServerPort
           value: "3654"
+        - name: ClientSvc
+          value: "client-svc"
+        - name: ClientPort
+          value: "3317"
         ports:
-        - containerPort: 3317
+        - containerPort: 1234
 ---
 apiVersion: v1
 kind: Service
@@ -37,6 +41,8 @@ spec:
   sessionAffinityConfig:
     clientIP:
       timeoutSeconds: 10800
+  externalIPs:
+    - 10.55.110.177
   ports:
   - name: mgt-port
     protocol: TCP
