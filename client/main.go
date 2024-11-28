@@ -13,6 +13,7 @@ import (
 	"strconv"
 )
 
+// https://www.youtube.com/watch?v=w8xWTIFU4C8
 func Init() {
 	ticketLength := utils.GetEnv("TicketLength", "500")
 	rate := utils.GetEnv("Rate", "10000")
