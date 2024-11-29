@@ -1,0 +1,18 @@
+<dependencies>
+    <!-- Jetty Server with HTTP/2 support -->
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>11.0.7</version>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlet</artifactId>
+        <version>11.0.7</version>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-http2</artifactId>
+        <version>11.0.7</version>
+    </dependency>
+</dependencies>
