@@ -47,7 +47,10 @@ func measure(w http.ResponseWriter, r *http.Request) {
 }
 
 func metrics(w http.ResponseWriter, r *http.Request) {
-	podMetricInfo := metric.GetMetric()
+	podMetricInfo, err := metric.GetMetric()
+	if err != nil {
+		panic(err)
+	}
 	bodyResp, err := json.Marshal(podMetricInfo)
 	if err != nil {
 		panic(err)

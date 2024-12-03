@@ -9,32 +9,36 @@ import (
 	"strconv"
 )
 
-type MetricPod struct {
+type PodMetric struct {
 	Name string `json:"name"`
 	Ip string `json:"ip"`
 	NumberOfGoroutine int `json:"number_of_goroutine"`
 	NumberOfThread int `json:"number_of_thread"`
 	NumberOfProcess int `json:"number_of_process"`
 	NumberOfCpu int `json:"number_of_cpu"`
-	MemUsage int `json:"mem_usage"`
-	CpuUsage int `json:"cpu_usage"`
+	MemUsage int64 `json:"mem_usage"`
+	CpuUsage float64 `json:"cpu_usage"`
 }
 
-func GetMetric() *MetricPod {
-	numGoroutines := runtime.NumGoroutine()
-	numCpu := runtime.NumCPU()
+func GetMetric() (*PodMetric, error) {
+	var metricPod *PodMetric
+	metricPod.Name = utils.GetHostName()
+	metricPod.Ip = utils.GetLocalIP()
+	metricPod.NumberOfGoroutine = runtime.NumGoroutine()
+	metricPod.NumberOfCpu = runtime.NumCPU()
 
-	
-	return &MetricPod{
-		Name:              utils.GetHostName(),
-		Ip:                utils.GetLocalIP(),
-		NumberOfGoroutine: numGoroutines,
-		NumberOfCpu:       numCpu,
-		MemUsage:          int(memUsage),
+	cpuUsage, memUsage, err := getMemCpuUsage()
+	if err != nil {
+		return nil, err
 	}
+
+	metricPod.CpuUsage = cpuUsage
+	metricPod.MemUsage = memUsage
+
+	return metricPod, nil
 }
 
-func getMemCpuUsage() (float64, float64, error) {
+func getMemCpuUsage() (float64, int64, error) {
 	cmd, err := exec.Command("top", "-b", "-n", "1", "|", "grep", "main").Output()
 	if err != nil {
 		log.Println(err)
@@ -61,20 +65,13 @@ func getMemCpuUsage() (float64, float64, error) {
 		}
 	}
 
-	memLimits := utils.GetEnv("MY_MEM")
-
-	return cpuPercentTotal, memPercentTotal, nil
-}
-
-/*
-func GetMetric() *MetricPod {
-	
-
-	return &MetricPod {
-		Name: utils.GetHostName(),
-		Ip: utils.GetLocalIP(),
-		NumberOfGoroutine: runtime.NumGoroutine(),
-		NumberOfCpu: runtime.NumCPU(),
+	memLimitsStr := utils.GetEnv("MY_MEM_LIMIT", "4294967296")
+	memLimits, err := strconv.ParseInt(memLimitsStr, 10, 64)
+	if err != nil {
+		return 0, 0, err
 	}
+	
+	memUsage := memLimits * int64(memPercentTotal * 100) / 100
+
+	return cpuPercentTotal, memUsage, nil
 }
-*/
