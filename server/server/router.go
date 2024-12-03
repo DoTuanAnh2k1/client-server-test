@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"server/common"
 	"server/consumer/test"
+	"server/metric"
 )
 
 func initHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +46,16 @@ func measure(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
+func metrics(w http.ResponseWriter, r *http.Request) {
+	podMetricInfo := metric.GetMetric()
+	bodyResp, err := json.Marshal(podMetricInfo)
+	if err != nil {
+		panic(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(bodyResp)
+}
+
 func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/test", testHandler)
@@ -52,5 +63,6 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("/info", infoHandler)
 	mux.HandleFunc("/problem", problemHandler)
 	mux.HandleFunc("/measure", measure)
+	mux.HandleFunc("/metrics", metrics)
 	return mux
 }

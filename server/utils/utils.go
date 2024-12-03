@@ -29,3 +29,11 @@ func GetLocalIP() string {
     }
     return ""
 }
+
+func GetHostName() string {
+    name, err := os.Hostname()
+    if err != nil {
+        return ""
+    }
+    return name
+}
