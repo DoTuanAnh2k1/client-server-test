@@ -10,7 +10,8 @@ func receive() {
 	for {
 		msg, err := reader.ReadMessage(context.Background())
 		if err != nil {
-			log.Fatalf("Error while receiving message: %v", err)
+			log.Printf("Error while receiving message: %v", err)
+			return
 		}
 		common.CountRequestStart++
 		if string(msg.Value) == common.MessageBody {

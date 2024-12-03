@@ -1,13 +1,16 @@
 package rabbitmq
 
 import (
+	"log"
 	"server/common"
 )
 
 func receive() {
 	messQueue, err := session.Stream()
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		// panic(err)
+		return
 	}
 	for msg := range messQueue {
 		common.CountRequestStart++
