@@ -1,22 +1,36 @@
-package main
+package client
 
 import (
 	"crypto/tls"
 	"log"
+	"os"
 )
 
-func main() {
-	log.SetFlags(log.Lshortfile)
+func NewClient() {
+	// caCertBytes, err := os.ReadFile("ca.crt")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// caCertPem, _ := pem.Decode(caCertBytes)
+	// caCert, err := x509.ParseCertificate(caCertPem.Bytes)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// caList := x509.NewCertPool()
+	// caList.AddCert(caCert)
+
+	keyLogFile, err := os.OpenFile("keylog.txt", os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatalf("Failed to open key log file: %v", err)
+	}
+	defer keyLogFile.Close()
 
 	conf := &tls.Config{
-		MaxVersion:         tls.VersionTLS12,
-		InsecureSkipVerify: true,
-		// CipherSuites: []uint16{
-		// 	tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-		// 	tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
-		// 	tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-		// 	tls.TLS_RSA_WITH_AES_128_CBC_SHA,
-		// },
+		MaxVersion: tls.VersionTLS12,
+		// MaxVersion:         tls.VersionTLS13,
+		InsecureSkipVerify: true, // to by pass verify certificate
+		// RootCAs:            caList,
+		KeyLogWriter: keyLogFile,
 	}
 
 	conn, err := tls.Dial("tcp", "127.0.0.1:8443", conf)
@@ -37,10 +51,11 @@ func main() {
 		log.Println(n, err)
 		return
 	}
+
 	err = conn.Close()
 	if err != nil {
 		log.Println(err)
 	}
 
-	println(string(buf[:n]))
+	log.Println(string(buf[:n]))
 }
