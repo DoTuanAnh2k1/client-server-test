@@ -2,22 +2,24 @@ package client
 
 import (
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"log"
 	"os"
 )
 
 func NewClient() {
-	// caCertBytes, err := os.ReadFile("ca.crt")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// caCertPem, _ := pem.Decode(caCertBytes)
-	// caCert, err := x509.ParseCertificate(caCertPem.Bytes)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// caList := x509.NewCertPool()
-	// caList.AddCert(caCert)
+	caCertBytes, err := os.ReadFile("ca.crt")
+	if err != nil {
+		panic(err)
+	}
+	caCertPem, _ := pem.Decode(caCertBytes)
+	caCert, err := x509.ParseCertificate(caCertPem.Bytes)
+	if err != nil {
+		panic(err)
+	}
+	caList := x509.NewCertPool()
+	caList.AddCert(caCert)
 
 	keyLogFile, err := os.OpenFile("keylog.txt", os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {

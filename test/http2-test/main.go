@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"fmt"
@@ -57,6 +58,7 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("/5", reqDelay5sHandler)
 	mux.HandleFunc("/10", reqDelay10sHandler)
 	mux.HandleFunc("/15", reqDelay15sHandler)
+	mux.HandleFunc("/post", postHandler)
 	return mux
 }
 
@@ -86,6 +88,12 @@ func reqDelay15sHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
 }
 
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Handler post request")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}
+
 func NewClientVer2() {
 	c := &http.Client{
 		Transport: &http2.Transport{
@@ -95,7 +103,12 @@ func NewClientVer2() {
 		},
 		Timeout: 2 * time.Second,
 	}
-	resp, err := c.Get("http://localhost:8457/")
+	bodyMess := "Abc-ASDJIOEF"
+	url := "http://localhost:8457/post"
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader([]byte(bodyMess)))
+	req.Header.Set("Abc-ASDJIOEF-----b", "value")
+	// resp, err := c.Get("http://localhost:8457/")
+	resp, err := c.Do(req)
 	if err != nil {
 		panic(err)
 	}
@@ -148,9 +161,9 @@ func multiflexingTest() {
 }
 
 func main() {
-	// go NewHTTPServer(HTTPVersion2)
+	go NewHTTPServer(HTTPVersion2)
 	// // go NewHTTPServer(HTTPVersion1)
-	// // NewClientVer2()
+	NewClientVer2()
 	// NewClientVer1()
-	multiflexingTest()
+	// multiflexingTest()
 }

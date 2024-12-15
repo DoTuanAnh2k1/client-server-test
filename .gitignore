@@ -34,3 +34,7 @@ test/http2-test/vendor/*
 test/proto-bench/go.mod
 test/proto-bench/go.sum
 test/proto-bench/vendor/*
+
+test/https-test/go.mod
+test/https-test/go.sum
+test/https-test/vendor/*
