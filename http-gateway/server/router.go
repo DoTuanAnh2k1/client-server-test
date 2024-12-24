@@ -19,28 +19,20 @@ var (
 )
 
 func newMetricRouter() *http.ServeMux {
+	prefix := "/nsmf-metric/v1"
 	mux := http.NewServeMux()
-	muxSubPath := http.NewServeMux()
-	
 	for _, router := range metricRouter {
-		muxSubPath.HandleFunc(router.Pattern, router.HandlerFunc)
+		mux.HandleFunc(prefix+router.Pattern, router.HandlerFunc)
 	}
-
-	mux.Handle("/nsmf-metric/v1/", http.StripPrefix("/nsmf-metric/v1/", muxSubPath))
-	
 	return mux
 }
 
 func newServiceRouter() *http.ServeMux {
+	prefix := "/nsmf-svc/v1"
 	mux := http.NewServeMux()
-	muxSubPath := http.NewServeMux()
-	
 	for _, router := range serviceRouter {
-		muxSubPath.HandleFunc(router.Pattern, router.HandlerFunc)
+		mux.HandleFunc(prefix+router.Pattern, router.HandlerFunc)
 	}
-
-	mux.Handle("/nsmf-svc/v1/", http.StripPrefix("/nsmf-svc/v1/", muxSubPath))
-	
 	return mux
 }
 

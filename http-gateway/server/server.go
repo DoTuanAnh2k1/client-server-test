@@ -8,22 +8,24 @@ import (
 )
 
 func StartMetricServer() {
+	addHandleMetricRouter()
 	h2s := http2.Server{}
 	mux := newMetricRouter()
 	port := utils.GetEnv("MetricPort", "33363")
 	
-	mertricServer := &http.Server{
+	metricServer := &http.Server{
 		Addr:    ":" + port,
 		Handler: h2c.NewHandler(mux, &h2s),
 	}
 
-	err := mertricServer.ListenAndServe()
+	err := metricServer.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
 }
 
 func StartServiceServer() {
+	addHandleServiceRouter()
 	h2s := http2.Server{}
 	mux := newServiceRouter()
 	port := utils.GetEnv("ServicePort", "2194")
