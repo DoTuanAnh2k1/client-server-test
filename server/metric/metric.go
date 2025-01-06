@@ -30,7 +30,7 @@ func GetMetric() (*PodMetric, error) {
 
 	cpuUsage, memUsage, err := getMemCpuUsage()
 	if err != nil {
-		return metricPod, err
+		return &metricPod, err
 	}
 
 	metricPod.CpuUsage = cpuUsage

@@ -60,7 +60,17 @@ func metrics(w http.ResponseWriter, r *http.Request) {
 	w.Write(bodyResp)
 }
 
-func newRouter() *http.ServeMux {
+func overloadControlMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if common.CountRequestSuccessRate > 1000 {
+			w.WriteHeader(http.StatusTooManyRequests)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func newRouter() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/test", testHandler)
 	mux.HandleFunc("/init", initHandler)
@@ -68,5 +78,7 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("/problem", problemHandler)
 	mux.HandleFunc("/measure", measure)
 	mux.HandleFunc("/metrics", metrics)
-	return mux
+
+	overloadControlMux := overloadControlMiddleware(mux)
+	return overloadControlMux
 }
